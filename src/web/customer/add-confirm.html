@@ -1,22 +1,80 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>案件情報入力</title>
-    <!-- Bootstrap CSSの読み込み -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <meta charset="UTF-8">
+  <title>顧客情報確認</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container mt-5">
-        <!-- ここにHTMLを書く -->
+  <div class="container mt-5">
+    <h2 class="mb-4">顧客情報確認</h2>
+    <div class="form-group">
+      <label>会社名:</label>
+      <p id="companyName"></p>
     </div>
-    <script type="module">
-        <!-- ここにJSを書く -->
-    </script>
-    <!-- BootstrapのJavaScriptの読み込み -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <div class="form-group">
+      <label>業種:</label>
+      <p id="industry"></p>
+    </div>
+    <div class="form-group">
+      <label>連絡先:</label>
+      <p id="contact"></p>
+    </div>
+    <div class="form-group">
+      <label>所在地:</label>
+      <p id="location"></p>
+    </div>
+    <form id="final-submit-form">
+      <input type="hidden" name="companyName">
+      <input type="hidden" name="industry">
+      <input type="hidden" name="contact">
+      <input type="hidden" name="location">
+      <button type="submit" class="btn btn-success">送信する</button>
+      <a href="add.html" class="btn btn-secondary">戻る</a>
+    </form>
+  </div>
+
+  <script type="module">
+    import config from './config.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const form = document.getElementById('final-submit-form');
+
+    // 値を表示
+    document.getElementById('companyName').textContent = params.get('companyName');
+    document.getElementById('industry').textContent = params.get('industry');
+    document.getElementById('contact').textContent = params.get('contact');
+    document.getElementById('location').textContent = params.get('location');
+
+    // hidden inputにセット
+    form.companyName.value = params.get('companyName');
+    form.industry.value = params.get('industry');
+    form.contact.value = params.get('contact');
+    form.location.value = params.get('location');
+
+    // 送信処理
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      fetch(config.apiUrl + '/customer/add-customer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams([...formData])
+      }).then(res => res.json())
+        .then(data => {
+          if(data.success) {
+            alert('顧客情報を登録しました');
+            window.location.href = 'list.html'; // 完了後に一覧へリダイレクト
+          } else {
+            alert('登録に失敗しました');
+          }
+        }).catch(err => {
+          console.error('Error:', err);
+          alert('エラーが発生しました');
+        });
+    });
+  </script>
 </body>
 </html>

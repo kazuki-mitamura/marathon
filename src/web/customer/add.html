@@ -1,6 +1,32 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <meta charset="UTF-8">
+  <title>HOME</title>
+  <style>
+    body {
+      margin: 20px;
+      font-size: 20px; /
+    }
+    a {
+      font-size: 20px;
+      text-decoration: none;
+      color: #3366cc;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>HOME</h1>
+  <p><a href="/customer/list.html">▶ 顧客一覧を見る</a></p>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>顧客情報入力</title>
@@ -10,51 +36,38 @@
 <body>
     <div class="container mt-5">
         <h2 class="mb-4">顧客情報を入力してください</h2>
-        <form id="customer-form">
-            <div class="form-group">
-                <label for="companyName">会社名:</label>
-                <input type="text" class="form-control" id="companyName" name="companyName" required>
-            </div>
-            <div class="form-group">
-                <label for="industry">業種:</label>
-                <input type="text" class="form-control" id="industry" name="industry" required>
-            </div>
-            <div class="form-group">
-                <label for="contact">連絡先:</label>
-                <input type="text" class="form-control" id="contact" name="contact" required>
-            </div>
-            <div class="form-group">
-                <label for="location">所在地:</label>
-                <input type="text" class="form-control" id="location" name="location" required>
-            </div>
-            <button type="submit" class="btn btn-primary">送信</button>
-        </form>
-    </div>
-    <script type="module">
-        import config from '../config.js';
+       <!-- 顧客情報入力フォーム -->
+<form id="customer-form">
+  <div class="form-group">
+    <label for="companyName">会社名:</label>
+    <input type="text" class="form-control" id="companyName" name="companyName" required>
+  </div>
+  <div class="form-group">
+    <label for="industry">業種:</label>
+    <input type="text" class="form-control" id="industry" name="industry" required>
+  </div>
+  <div class="form-group">
+    <label for="contact">連絡先:</label>
+    <input type="text" class="form-control" id="contact" name="contact" required>
+  </div>
+  <div class="form-group">
+    <label for="location">所在地:</label>
+    <input type="text" class="form-control" id="location" name="location" required>
+  </div>
+  <button type="submit" class="btn btn-primary">確認画面へ</button>
+</form>
 
-        document.getElementById('customer-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            fetch(config.apiUrl + '/add-customer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams([...formData])
-            }).then(response => response.json())
-              .then(data => {
-                if(data.success) {
-                    alert('顧客情報が正常に保存されました。');
-                    // フォームをリセット
-                    document.getElementById('customer-form').reset();
-                } else {
-                    alert('保存に失敗しました。');
-                }
-              })
-              .catch(error => console.error('Error:', error));
-        });
-    </script>
+<script type="module">
+  document.getElementById('customer-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const params = new URLSearchParams(formData).toString();
+
+    // 確認画面へ遷移（GETで値を渡す）
+    window.location.href = `add-confirm.html?${params}`;
+  });
+</script>
     <!-- BootstrapのJavaScriptの読み込み -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>顧客詳細</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body class="container mt-5">
+  <h2>顧客詳細</h2>
+
+  <!-- 入力フォーム -->
+  <div class="mb-3">
+    <label>会社名: <input type="text" id="company_name" class="form-control" /></label><br />
+    <label>業種: <input type="text" id="industry" class="form-control" /></label><br />
+    <label>連絡先: <input type="text" id="contact" class="form-control" /></label><br />
+    <label>所在地: <input type="text" id="location" class="form-control" /></label><br />
+    <button class="btn btn-primary" onclick="updateCustomer()">更新</button>
+  </div>
+
+  <!-- 詳細テーブル -->
+  <table class="table table-bordered mt-3">
+    <tbody id="customer-details">
+      <!-- 詳細データがここに挿入される -->
+    </tbody>
+  </table>
+
+  <!-- 削除ボタン -->
+  <button id="delete-btn" class="btn btn-danger mt-3">削除</button>
+  <a href="/customer/list.html" class="btn btn-secondary mt-3 ml-2">← 顧客一覧に戻る</a>
+
+  <!-- スクリプト -->
+  <script type="module">
+    import config from './config.js';
+
+    const customerId = new URLSearchParams(window.location.search).get('id');
+    if (!customerId) {
+      alert("顧客IDが指定されていません");
+      window.location.href = "/customer/list.html";
+    }
+
+    // 顧客データの読み込みと表示
+    async function loadCustomer() {
+      try {
+        const res = await fetch(`${config.apiUrl}/customer/${customerId}`);
+        if (!res.ok) throw new Error("データ取得失敗");
+
+        const data = await res.json();
+
+        // 入力フォームへ表示
+        document.getElementById("company_name").value = data.company_name || "";
+        document.getElementById("industry").value = data.industry || "";
+        document.getElementById("contact").value = data.contact || "";
+        document.getElementById("location").value = data.location || "";
+
+        // テーブル表示
+        const tbody = document.getElementById("customer-details");
+        tbody.innerHTML = '';
+
+        const labels = {
+          customer_id: "顧客ID",
+          company_name: "会社名",
+          industry: "業種",
+          contact: "連絡先",
+          location: "所在地",
+          created_date: "作成日",
+          updated_date: "更新日"
+        };
+
+        for (const [key, label] of Object.entries(labels)) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<th>${label}</th><td>${data[key] ?? ''}</td>`;
+          tbody.appendChild(tr);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("顧客情報の取得に失敗しました");
+      }
+    }
+
+    // 更新処理
+    window.updateCustomer = async function () {
+      const company_name = document.getElementById("company_name").value;
+      const industry = document.getElementById("industry").value;
+      const contact = document.getElementById("contact").value;
+      const location = document.getElementById("location").value;
+
+      if (!confirm("この内容で更新してよろしいですか？")) return;
+
+      try {
+        const res = await fetch(`${config.apiUrl}/customer/${customerId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_name, industry, contact, location }),
+        });
+
+        if (res.ok) {
+          alert("更新完了しました！");
+          loadCustomer(); // 更新後再読み込み
+        } else {
+          alert("更新に失敗しました。");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("サーバーエラー");
+      }
+    }
+
+    // 削除処理
+    document.getElementById("delete-btn").addEventListener("click", async () => {
+      if (!confirm("削除してもよろしいですか？")) return;
+
+      try {
+        const res = await fetch(`${config.apiUrl}/customer/${customerId}`, {
+          method: 'DELETE',
+        });
+
+        const result = await res.json();
+        if (result.success) {
+          alert("削除しました");
+          window.location.href = "/customer/list.html";
+        } else {
+          alert("削除に失敗しました");
+        }
+      } catch (error) {
+        console.error('削除エラー:', error);
+        alert("通信エラーが発生しました");
+      }
+    });
+
+    // 初期表示処理
+    loadCustomer();
+  </script>
+</body>
+</html>
