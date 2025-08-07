@@ -1,0 +1,20 @@
+name: ssh command
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH Deploy and Cypress Test
+        uses: invi5H/ssh-action@v1
+        with:
+          SSH_HOST: ${{ secrets.DEV_SSH_HOST }}
+          SSH_PORT: ${{ secrets.DEV_SSH_PORT }}
+          SSH_USER: ${{ secrets.DEV_SSH_USER }}
+	  SSH_KEY: ${{ secrets.DEV_SSHE_SSH_KEY }}
+          CMD: |
+            bash /app/deploy_test.sh kazuki_mitamura_xz

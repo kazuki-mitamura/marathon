@@ -42,7 +42,7 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     env_file:
       - .env
-
+#コメント
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
